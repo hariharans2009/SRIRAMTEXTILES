@@ -80,7 +80,7 @@
                 for i in b[1:]:
                     screen_print(i)
                 Sl_no += 1  
-                a = window.prompt("Enter '+' to print bill,\n'a' to add dress,\n'c' to change item,\n'r' to remove item,\n'd' to delete bill.")  
+                a = window.prompt("Enter 'p' to print bill,\n'a' to add dress,\n'c' to change item,\n'r' to remove item,\n'd' to delete bill.")  
                 while True:
                     if a == "c":
                         await asyncio.sleep(0.5)
@@ -130,7 +130,7 @@
                             break
                     elif a in ['p', 'a', 'd']:
                         break
-                if a == "+":
+                if a == "p":
                     G_total = sum(item[6] for item in b[1:])
                     screen_print("\n" + "_"*40)
                     screen_print("          SRI RAM TEXTILES")
