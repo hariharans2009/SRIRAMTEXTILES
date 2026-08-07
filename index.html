@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+    <style>
+        body { 
+            background-color: #B7CEEC; 
+            color: #C83F49; 
+            font-family: sans-serif; 
+            text-align: center; 
+            margin: 0; 
+            padding: 10px; 
+        }
+        #output { 
+            font-family: 'Courier New', monospace; 
+            text-align: left; 
+            display: inline-block; 
+            white-space: pre-wrap; 
+            line-height: 1.2;
+            font-size: 16px; 
+            margin-top: 20px;
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <pre id="output">WELCOME TO SRIRAM'S BILLING SOFTWARE\n</pre>
+    
+    <script type="py">
+        import asyncio
+        import time
+        from pyscript import window, document
+
+        # Helper function to print to HTML screen
+        def screen_print(msg=""):
+            out_el = document.getElementById("output")
+            out_el.textContent += str(msg) + "\n"
+
+        # Item Code Mapping
+        DRESS_CODES = {
+            "1": "SAREE", "2": "DHOTI", "3": "TOWEL", "4": "KERCHIF",
+            "5": "JETTY", "6": "BANIYAN", "7": "SHIMMY", "8": "NIGHTY",
+            "9": "LUNGI", "10": "SHAAL", "11": "BEDSHEET", "12": "SCREEN",
+            "13": "SCREEN CLOTH", "14": "PAAVADAI", "15": "BLOUSE BIT",
+            "16": "LINING", "17": "TOPS", "18": "FROCK", "19": "CHUDI",
+            "20": "LEHENGA", "21": "T.SHIRT", "22": "SHIRT", "23": "PANT",
+            "24": "SHORTS", "25": "T.PANT", "26": "SHIRTING", "27": "SUITING",
+            "28": "COAT SUIT"
+        }
+
+        async def main():
+            Sl_no = 1
+            G_total = 0.0
+            b = [[]]
+
+            await asyncio.sleep(0.5)
+            
+            # Print Dress Menu
+            menu_text = "DRESS CODE MENU:\n" + "\n".join([f"{k} = {v}" for k, v in DRESS_CODES.items()])
+            screen_print(menu_text)
+            screen_print()
+
+            while Sl_no > 0:
+                await asyncio.sleep(0.5)
+                Dr_code = window.prompt("Enter the dress code:")
+                if not Dr_code or Dr_code not in DRESS_CODES:
+                    screen_print("UNKNOWN DRESS CODE")
+                    continue
+                
+                Dr_name = DRESS_CODES[Dr_code]
+                
+                Dr_amt = float(window.prompt("Enter the amount of dress:") or 0)
+                
+                if Dr_name in ["SHIRTING", "SUITING", "LINING", "SCREEN CLOTH"]:
+                    Dr_mtr = float(window.prompt("Enter the meter of dress:") or 1.0)
+                else:
+                    Dr_mtr = 1.00
+
+                no_of_dr = int(window.prompt("Enter the no. of dresses:") or 1)
+                
+                total = Dr_amt * no_of_dr * Dr_mtr
+                
+                item = [Sl_no, Dr_code, Dr_name, Dr_amt, Dr_mtr, no_of_dr, total]
+                b.append(item)
+                
+                screen_print("\nCurrent Items:")
+                for i in b[1:]:
+                    screen_print(i)
+
+                Sl_no += 1
+                
+                a = window.prompt("Enter 'p' to print bill,\n'a' to add dress,\n'c' to change item,\n'r' to remove item,\n'd' to delete bill.")
+                
+                while True:
+                    if a == "c":
+                        x = int(window.prompt('Enter the S.No of the item to modify:'))
+                        y = int(window.prompt('Enter "1" to change dress code,\n"3" to change amount,\n"4" to change mtr,\n"5" to change quantity.'))
+                        
+                        if y == 1:
+                            new_code = window.prompt('Enter new dress code:')
+                            if new_code in DRESS_CODES:
+                                b[x][1] = new_code
+                                b[x][2] = DRESS_CODES[new_code]
+                        elif y == 3:
+                            b[x][3] = float(window.prompt('Enter new amount:') or 0)
+                            b[x][6] = b[x][3] * b[x][4] * b[x][5]
+                        elif y == 4:
+                            b[x][4] = float(window.prompt('Enter new meters:') or 1.0)
+                            b[x][6] = b[x][3] * b[x][4] * b[x][5]
+                        elif y == 5:
+                            b[x][5] = int(window.prompt('Enter new quantity:') or 1)
+                            b[x][6] = b[x][3] * b[x][4] * b[x][5]
+
+                        screen_print("\nUpdated Items:")
+                        for i in b[1:]:
+                            screen_print(i)
+                            
+                        a = window.prompt("Enter 'p' to print bill, 'a' to add dress, 'c' to change, 'r' to remove, 'd' to delete.")
+                        if a in ['p', 'a', 'd']:
+                            break
+
+                    elif a == "r":
+                        x = int(window.prompt('Enter the S.No of dress to remove:'))
+                        if 0 < x < len(b):
+                            del b[x]
+                            # Update serial numbers
+                            for idx in range(1, len(b)):
+                                b[idx][0] = idx
+                            Sl_no -= 1
+
+                        screen_print("\nUpdated Items:")
+                        for i in b[1:]:
+                            screen_print(i)
+
+                        a = window.prompt("Enter 'p' to print bill, 'a' to add dress, 'c' to change, 'r' to remove, 'd' to delete.")
+                        if a in ['p', 'a', 'd']:
+                            break
+
+                    elif a in ['p', 'a', 'd']:
+                        break
+
+                if a == "p":
+                    G_total = sum(item[6] for item in b[1:])
+                    screen_print("\n" + "_"*40)
+                    screen_print("          SRI RAM TEXTILES")
+                    screen_print("        GANDHI BAZAR, GINGEE")
+                    screen_print("_"*40)
+                    screen_print(time.asctime(time.localtime()))
+                    screen_print("_"*40)
+                    for i in b[1:]:
+                        screen_print(f"S.No:{i[0]} | {i[2]} | Qty:{i[5]} | Mtr:{i[4]} | Amt:{i[3]} | Total:{i[6]}")
+                    screen_print("_"*40)
+                    screen_print(f"Grand Total = ₹{G_total:.2f}")
+                    screen_print("\nTHANK YOU! VISIT AGAIN!!")
+                    screen_print("_"*40)
+                    break
+
+                elif a == "a":
+                    continue
+
+                elif a == "d":
+                    b = [[]]
+                    screen_print("\nBill Deleted.")
+                    break
+
+        asyncio.ensure_future(main())
+    </script>
+</body>
+</html>
